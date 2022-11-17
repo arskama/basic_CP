@@ -1,0 +1,60 @@
+<!DOCTYPE HTML>
+<html lang="en">
+ <head>
+  <meta charset="utf-8">
+  <title>Worker example: One-core computation</title>
+ </head>
+ <body>
+ <button type="button" onclick="changeBkColor()">Change Color</button>
+ <button type="button" onclick="startCP()">Start CP</button>
+ <button type="button" onclick="stopCP()">Stop CP</button>
+
+  <p>The highest prime number discovered so far is: <output id="result"></output></p>
+  <p>Current CP state is: <output id="CPresult"></output></p>
+
+
+  <script>
+  var isBlue = 1;
+  function changeBkColor()
+  {
+    if (isBlue) {
+     document.body.style.backgroundColor= "DarkSeaGreen";
+     isBlue = 0;
+    } else {
+     document.body.style.backgroundColor= "LightCoral";
+     isBlue = 1;
+    }
+
+
+  }
+   var worker = new Worker('worker.js');
+   worker.onmessage = function (event) {
+     document.getElementById('result').textContent = event.data;
+   };
+  </script>
+  <script>
+    function pressureCallbackX(update) {
+      console.log("cpuState X = " + update[0].state);
+      console.log("cpu factor X = " + update[0].factors[0]);
+    if (update[0].factors[1])
+      console.log("cpu factor X = " + update[0].factors[1]);
+      console.log("timestamp = " + update[0].timestamp);
+     document.getElementById('CPresult').textContent = update[0].state;
+  };
+
+  observerX = new PressureObserver(pressureCallbackX, {sampleRate : 0.5});
+
+
+  function startCP()
+  {
+    observerX.observe("cpu");
+  }
+
+  function stopCP()
+  {
+    observerX.unObserve("cpu");
+  }
+
+  </script>
+ </body>
+</html>
