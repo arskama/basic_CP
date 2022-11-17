@@ -10,36 +10,36 @@
  <button type="button" onclick="stopCP()">Stop CP</button>
 
   <p>The highest prime number discovered so far is: <output id="result"></output></p>
-  <p>Current CP state is: <output id="CPresult"></output></p>
+  <p>Current CP state is: <output id="CPResult"></output></p>
 
 
   <script>
-  var isBlue = 1;
+  document.body.style.backgroundColor= "LightCoral";
+  var isCoral = 1;
   function changeBkColor()
   {
-    if (isBlue) {
+    if (isCoral) {
      document.body.style.backgroundColor= "DarkSeaGreen";
-     isBlue = 0;
+     isCoral = 0;
     } else {
      document.body.style.backgroundColor= "LightCoral";
-     isBlue = 1;
+     isCoral = 1;
     }
 
 
   }
-   var worker = new Worker('worker.js');
-   worker.onmessage = function (event) {
-     document.getElementById('result').textContent = event.data;
-   };
-  </script>
-  <script>
-    function pressureCallbackX(update) {
+  var worker = new Worker('worker.js');
+  worker.onmessage = function (event) {
+    document.getElementById('result').textContent = event.data;
+  };
+
+  function pressureCallbackX(update) {
       console.log("cpuState X = " + update[0].state);
       console.log("cpu factor X = " + update[0].factors[0]);
     if (update[0].factors[1])
       console.log("cpu factor X = " + update[0].factors[1]);
       console.log("timestamp = " + update[0].timestamp);
-     document.getElementById('CPresult').textContent = update[0].state;
+     document.getElementById('CPResult').textContent = update[0].state;
   };
 
   observerX = new PressureObserver(pressureCallbackX, {sampleRate : 0.5});
@@ -52,7 +52,7 @@
 
   function stopCP()
   {
-    observerX.unObserve("cpu");
+    observerX.unobserve("cpu");
   }
 
   </script>
