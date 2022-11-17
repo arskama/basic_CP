@@ -1,3 +1,5 @@
+
+/*
 var n = 1;
 search: while (true) {
   n += 1;
@@ -7,3 +9,10 @@ search: while (true) {
   // found a prime!
   postMessage(n);
 }
+*/
+
+let n = 0;
+let timer = setInterval(function() {
+  n = n + 1;
+  postMessage(n);
+}, 1000);
