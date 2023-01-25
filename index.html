@@ -23,64 +23,60 @@
 
 
   <script>
-  document.body.style.backgroundColor= "LightCoral";
-  var isCoral = 1;
-  function changeBkColor()
-  {
-    if (isCoral) {
-     document.body.style.backgroundColor= "DarkSeaGreen";
-     isCoral = 0;
-    } else {
-     document.body.style.backgroundColor= "LightCoral";
-     isCoral = 1;
+    document.body.style.backgroundColor= "LightCoral";
+    let isCoral = 1;
+    function changeBkColor()
+    {
+      if (isCoral) {
+      document.body.style.backgroundColor= "DarkSeaGreen";
+      isCoral = 0;
+      } else {
+      document.body.style.backgroundColor= "LightCoral";
+      isCoral = 1;
+      }
     }
 
-
-  }
-
-  function pressureCallbackX(update) {
+    function pressureCallbackX(update) {
       console.log("cpuState X = " + update[0].state);
       console.log("cpu factor X = " + update[0].factors[0]);
-    if (update[0].factors[1])
-      console.log("cpu factor X = " + update[0].factors[1]);
+      if (update[0].factors[1])
+        console.log("cpu factor X = " + update[0].factors[1]);
       console.log("timestamp = " + update[0].time);
      document.getElementById("CPWState").textContent = update[0].state;
-  };
+    };
 
-  observerX = new PressureObserver(pressureCallbackX, {sampleRate : 0.5});
+    observerX = new PressureObserver(pressureCallbackX, {sampleRate : 0.5});
 
+    function startCP() {
+      observerX.observe("cpu");
+    }
 
-  function startCP()
-  {
-    observerX.observe("cpu");
-  }
+    function stopCP() {
+      observerX.unobserve("cpu");
+      document.getElementById("CPWState").textContent = "";
+    }
 
-  function stopCP()
-  {
-    observerX.unobserve("cpu");
-    document.getElementById("CPWState").textContent = "";
-  }
-
-//  var myDedicatedWorker = new Worker('d_worker.mjs', { type: "module"});
-  var myDedicatedWorker = new Worker('d_worker.js');
-  myDedicatedWorker.onmessage = function (event) {
-    document.getElementById("CPDWState").textContent = event.data.state;
-    document.getElementById("CPDWTimestamp").textContent = event.data.time;
-    document.getElementById("CPDWSource").textContent = event.data.source;
-    document.getElementById("CPDWFactors").textContent = event.data.factors;
-    console.log(typeof event.data + " NONO");
-  };
-/*
-  var mySharedWorker = new SharedWorker('s_worker.js', { type: "module"});
-  worker.onmessage = function (event) {
-    document.getElementById("CPDWState").textContent = event.data.state;
-    document.getElementById("CPDWTimestamp").textContent = event.data.time;
-    document.getElementById("CPDWSource").textContent = event.data.source;
-    document.getElementById("CPDWFactors").textContent = event.data.factors;
-    console.log(typeof event.data + " NONO");
+/*    const myDedicatedWorker = new Worker('d_worker.js');
+    myDedicatedWorker.onmessage = function(event) {
+      document.getElementById("CPDWState").textContent = event.data.state;
+      document.getElementById("CPDWTimestamp").textContent = event.data.time;
+      document.getElementById("CPDWSource").textContent = event.data.source;
+    };
+*/
+    var mySharedWorker = new SharedWorker('s_worker.js');
+    console.log("asd- X " + typeof mySharedWorker);
+    const message = "Hello you ;)";
+    mySharedWorker.port.start();
+    mySharedWorker.port.postMessage([message]);
+    mySharedWorker.port.onmessage = function(e) {
+      console.log("ALLO " + e.data);
+    }
+/*  mySharedWorker.onmessage = function (event) {
+    document.getElementById("CPSWState").textContent = event.data.state;
+    document.getElementById("CPSWTimestamp").textContent = event.data.time;
+    document.getElementById("CPSWSource").textContent = event.data.source;
   };
 */
-
   </script>
  </body>
 </html>
