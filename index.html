@@ -5,78 +5,110 @@
   <title>Worker example: One-core computation</title>
  </head>
  <body>
- <button type="button" onclick="changeBkColor()">Change Color</button>
- <button type="button" onclick="startCP()">Start Window CP</button>
- <button type="button" onclick="stopCP()">Stop Window CP</button>
+  <button type="button" onclick="changeBkColor()">Change Color</button>
+  <button type="button" onclick="startCP()">Start Window CP</button>
+  <button type="button" onclick="stopCP()">Stop Window CP</button>
 
-  <h2> Dedicated worker is started at page launch</h2>
-  <p> ------------------------------------------------------------------------------------------- </p>
-  <p>Current CP state from observer in Window is: <output id="CPWState"></output></p>
-  <p> ------------------------------------------------------------------------------------------- </p>
-  <p>Current CP state from observer in dedicated worker is: <output id="CPDWState"></output></p>
-  <p>Current CP timestamp from obserser in dedicated worker is: <output id="CPDWTimestamp"></output></p>
-  <p>Current CP source from observer in dedicated worker is: <output id="CPDWSource"></output></p>
-  <p> ------------------------------------------------------------------------------------------- </p>
-  <p>Current CP state from observer in shared worker is: <output id="CPSWState"></output></p>
-  <p>Current CP timestamp from obserser in shared worker is: <output id="CPSWTimestamp"></output></p>
-  <p>Current CP source from observer in shared worker is: <output id="CPSWSource"></output></p>
+   <h2> Dedicated worker is started at page launch</h2>
+   <p> ------------------------------------------------------------------------------------------- </p>
+   <p>Current CP state from observer in Window is: <output id="CPWState"></output></p>
+   <p> ------------------------------------------------------------------------------------------- </p>
+   <p>Current CP state from observer in dedicated worker is: <output id="CPDWState"></output></p>
+   <p>Current CP timestamp from obserser in dedicated worker is: <output id="CPDWTimestamp"></output></p>
+   <p>Current CP source from observer in dedicated worker is: <output id="CPDWSource"></output></p>
+   <p> ------------------------------------------------------------------------------------------- </p>
+   <p>Current CP state from observer in shared worker is: <output id="CPSWState"></output></p>
+   <p>Current CP timestamp from obserser in shared worker is: <output id="CPSWTimestamp"></output></p>
+   <p>Current CP source from observer in shared worker is: <output id="CPSWSource"></output></p>
 
+  <!--
+  // https://github.com/mdn/simple-shared-worker
+  <form>
+   <div>
+    <label for="number3">Square number: </label>
+    <input type="text" id="number3" value="0">
+   </div>
+  </form>
+    <p class="result2">Result: 0</p>
+  -->
+ </body>
+</html>
 
-  <script>
+<script>
+  document.body.style.backgroundColor= "LightCoral";
+  let isCoral = 1;
+  function changeBkColor()
+  {
+    if (isCoral) {
+    document.body.style.backgroundColor= "DarkSeaGreen";
+    isCoral = 0;
+    } else {
     document.body.style.backgroundColor= "LightCoral";
-    let isCoral = 1;
-    function changeBkColor()
-    {
-      if (isCoral) {
-      document.body.style.backgroundColor= "DarkSeaGreen";
-      isCoral = 0;
-      } else {
-      document.body.style.backgroundColor= "LightCoral";
-      isCoral = 1;
-      }
+    isCoral = 1;
     }
+  }
 
-    function pressureCallbackX(update) {
-      console.log("cpuState X = " + update[0].state);
-      console.log("cpu factor X = " + update[0].factors[0]);
-      if (update[0].factors[1])
-        console.log("cpu factor X = " + update[0].factors[1]);
-      console.log("timestamp = " + update[0].time);
-     document.getElementById("CPWState").textContent = update[0].state;
-    };
+  function pressureCallbackX(update) {
+    console.log("cpuState X = " + update[0].state);
+    console.log("cpu factor X = " + update[0].factors[0]);
+    if (update[0].factors[1])
+      console.log("cpu factor X = " + update[0].factors[1]);
+    console.log("timestamp = " + update[0].time);
+   document.getElementById("CPWState").textContent = update[0].state;
+  };
 
-    observerX = new PressureObserver(pressureCallbackX, {sampleRate : 0.5});
+//  observerX = new PressureObserver(pressureCallbackX, {sampleRate : 0.5});
 
-    function startCP() {
-      observerX.observe("cpu");
-    }
+  function startCP() {
+    observerX.observe("cpu");
+  }
 
-    function stopCP() {
-      observerX.unobserve("cpu");
-      document.getElementById("CPWState").textContent = "";
-    }
+  function stopCP() {
+    observerX.unobserve("cpu");
+    document.getElementById("CPWState").textContent = "";
+  }
 
-/*    const myDedicatedWorker = new Worker('d_worker.js');
-    myDedicatedWorker.onmessage = function(event) {
-      document.getElementById("CPDWState").textContent = event.data.state;
-      document.getElementById("CPDWTimestamp").textContent = event.data.time;
-      document.getElementById("CPDWSource").textContent = event.data.source;
-    };
-*/
-    var mySharedWorker = new SharedWorker('s_worker.js');
-    console.log("asd- X " + typeof mySharedWorker);
-    const message = "Hello you ;)";
-    mySharedWorker.port.start();
-    mySharedWorker.port.postMessage([message]);
-    mySharedWorker.port.onmessage = function(e) {
-      console.log("ALLO " + e.data);
-    }
-/*  mySharedWorker.onmessage = function (event) {
+  const myDedicatedWorker = new Worker('d_worker.js');
+  myDedicatedWorker.onmessage = function(event) {
+    document.getElementById("CPDWState").textContent = event.data.state;
+    document.getElementById("CPDWTimestamp").textContent = event.data.time;
+    document.getElementById("CPDWSource").textContent = event.data.source;
+  };
+
+  const mySharedWorker = new SharedWorker('s_worker.js');
+  console.log("asd- X " + typeof mySharedWorker);
+  mySharedWorker.port.start();
+  let message = "Moro poro";
+  mySharedWorker.port.postMessage([message]);
+  mySharedWorker.port.onmessage = function(e) {
+    console.log("ALLO " + e.data);
+  }
+  mySharedWorker.port.onmessage = function (event) {
     document.getElementById("CPSWState").textContent = event.data.state;
     document.getElementById("CPSWTimestamp").textContent = event.data.time;
     document.getElementById("CPSWSource").textContent = event.data.source;
   };
+
+
+/*
+  // https://github.com/mdn/simple-shared-worker
+  var squareNumber = document.querySelector('#number3');
+  var result2 = document.querySelector('.result2');
+  console.log("ARNO >>");
+  if (!!window.SharedWorker) {
+    console.log("ARNO >> create wierke");
+    var myWorker = new SharedWorker("test_sworker.js");
+    mySharedWorker.port.start();
+
+    squareNumber.onchange = function() {
+      myWorker.port.postMessage([squareNumber.value, squareNumber.value]);
+      console.log('Message posted to worker');
+    }
+
+    myWorker.port.onmessage = function(e) {
+      result2.textContent = e.data;
+      console.log('Message received from worker');
+    }
+  }
 */
-  </script>
- </body>
-</html>
+</script>
