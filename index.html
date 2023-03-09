@@ -57,7 +57,7 @@
    document.getElementById("CPWState").textContent = update[0].state;
   };
 
-//  observerX = new PressureObserver(pressureCallbackX, {sampleRate : 0.5});
+  observerX = new PressureObserver(pressureCallbackX, {sampleRate : 0.5});
 
   function startCP() {
     observerX.observe("cpu");
