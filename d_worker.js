@@ -20,9 +20,6 @@ let timer = setInterval(function() {
 function pressureCallbackWkr(update) {
     console.log("Update from Worker");
     console.log("cpuState X = " + update[0].state);
-    console.log("cpu factor X = " + update[0].factors[0]);
-  if (update[0].factors[1])
-    console.log("cpu factor X = " + update[0].factors[1]);
     console.log("timestamp = " + update[0].time);
     postMessage(update[0].toJSON());
 };

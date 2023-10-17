@@ -10,17 +10,16 @@ onconnect = function(e) {
 
   port.onmessage = function(e) {
     console.log("received from client. " + e.data[0]);
-    if (started === false)
+    if (started === false) {
       observerWorker.observe("cpu");
+      console.log("start WORKER");
+    }
     started = true;
     port.postMessage(e.data[0]);
   }
   function pressureCallbackWkr(update) {
     console.log("Update from Worker");
     console.log("cpuState X = " + update[0].state);
-    console.log("cpu factor X = " + update[0].factors[0]);
-    if (update[0].factors[1])
-      console.log("cpu factor X = " + update[0].factors[1]);
     console.log("timestamp = " + update[0].time);
     port.postMessage(update[0].toJSON());
 };
