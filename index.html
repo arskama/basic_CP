@@ -2,7 +2,7 @@
 <html lang="en">
  <head>
   <meta charset="utf-8">
-  <title>Worker example: One-core computation</title>
+  <title>Worker example: 1 shared, 1 dedicated, 1 Window</title>
  </head>
  <body>
   <button type="button" onclick="changeBkColor()">Change Color</button>
@@ -50,9 +50,6 @@
 
   function pressureCallbackX(update) {
     console.log("cpuState X = " + update[0].state);
-    console.log("cpu factor X = " + update[0].factors[0]);
-    if (update[0].factors[1])
-      console.log("cpu factor X = " + update[0].factors[1]);
     console.log("timestamp = " + update[0].time);
    document.getElementById("CPWState").textContent = update[0].state;
   };
@@ -69,6 +66,7 @@
   }
 
   const myDedicatedWorker = new Worker('d_worker.js');
+  console.log("STARTING WORKER D " + typeof myDedicatedWorker);
   myDedicatedWorker.onmessage = function(event) {
     document.getElementById("CPDWState").textContent = event.data.state;
     document.getElementById("CPDWTimestamp").textContent = event.data.time;
@@ -76,10 +74,9 @@
   };
 
   const mySharedWorker = new SharedWorker('s_worker.js');
-  console.log("asd- X " + typeof mySharedWorker);
+  console.log("STARTING WORKER S " + typeof mySharedWorker);
   mySharedWorker.port.start();
-  let message = "Moro poro";
-  mySharedWorker.port.postMessage([message]);
+  mySharedWorker.port.postMessage('MoroPoro');
   mySharedWorker.port.onmessage = function(e) {
     console.log("ALLO " + e.data);
   }
@@ -88,7 +85,6 @@
     document.getElementById("CPSWTimestamp").textContent = event.data.time;
     document.getElementById("CPSWSource").textContent = event.data.source;
   };
-
 
 /*
   // https://github.com/mdn/simple-shared-worker
