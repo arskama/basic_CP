@@ -12,6 +12,7 @@
    <h2> Dedicated worker is started at page launch</h2>
    <p> ------------------------------------------------------------------------------------------- </p>
    <p>Current CP state from observer in Window is: <output id="CPWState"></output></p>
+   <p>Current CP source from observer in Window is: <output id="CPWSource"></output></p>
    <p> ------------------------------------------------------------------------------------------- </p>
    <p>Current CP state from observer in dedicated worker is: <output id="CPDWState"></output></p>
    <p>Current CP timestamp from obserser in dedicated worker is: <output id="CPDWTimestamp"></output></p>
@@ -48,13 +49,14 @@
     }
   }
 
-  function pressureCallbackX(update) {
+ function pressureCallbackX(update) {
+    console.log("cpuState X = " + update[0].source);
     console.log("cpuState X = " + update[0].state);
     console.log("timestamp = " + update[0].time);
    document.getElementById("CPWState").textContent = update[0].state;
   };
 
-  observerX = new PressureObserver(pressureCallbackX, {sampleRate : 0.5});
+  observerX = new PressureObserver(pressureCallbackX);
 
   function startCP() {
     observerX.observe("cpu");

@@ -24,7 +24,7 @@ function pressureCallbackWkr(update) {
     postMessage(update[0].toJSON());
 };
 
-let observerWorker = new PressureObserver(pressureCallbackWkr, {sampleRate : 0.5});
+let observerWorker = new PressureObserver(pressureCallbackWkr);
 
 observerWorker.observe("cpu");
 
