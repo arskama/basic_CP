@@ -5,21 +5,32 @@
   <title>Worker example: 1 shared, 1 dedicated, 1 Window</title>
  </head>
  <body>
-  <button type="button" onclick="changeBkColor()">Change Color</button>
-  <button type="button" onclick="startCP()">Start Window CP</button>
-  <button type="button" onclick="stopCP()">Stop Window CP</button>
-
-   <h2> Dedicated worker is started at page launch</h2>
-   <p> ------------------------------------------------------------------------------------------- </p>
-   <p>Current CP state from observer in Window is: <output id="CPWState"></output></p>
-   <p> ------------------------------------------------------------------------------------------- </p>
-   <p>Current CP state from observer in dedicated worker is: <output id="CPDWState"></output></p>
-   <p>Current CP timestamp from obserser in dedicated worker is: <output id="CPDWTimestamp"></output></p>
-   <p>Current CP source from observer in dedicated worker is: <output id="CPDWSource"></output></p>
-   <p> ------------------------------------------------------------------------------------------- </p>
-   <p>Current CP state from observer in shared worker is: <output id="CPSWState"></output></p>
-   <p>Current CP timestamp from obserser in shared worker is: <output id="CPSWTimestamp"></output></p>
-   <p>Current CP source from observer in shared worker is: <output id="CPSWSource"></output></p>
+   <!--   <p>   <button type="button" onclick="changeBkColor()">Change Color</button> </p> -->
+   <h3> Dedicated  and shared worker observers are started at page launch</h3>
+   <h3> Window Observer is enabled/disabled with buttons</h3>
+   <p><b> ------ Window -------------------------------------------------------------------------------------</b></p>
+   <p>
+   <button type="button" onclick="start_cp()">Observe "cpu" window</button>
+   <button type="button" onclick="stop_cp()">Unobserve "cpu Window</button>
+   </p>
+   <p>State from observer 1 in Window: <b><output id="CPWState"></output></b></p>
+   <p>Source from observer 1 in Window: <b><output id="CPWSource"></output></b></p>
+   <p>
+   <button type="button" onclick="start_so_cp()">Observe "cpu-same-origin" window</button>
+   <button type="button" onclick="stop_so_cp()">Unobserve "cpu-same-origin" window</button>
+   </p>
+   <p>Sstate from observer 2 in Window: <b><output id="OSCPWState"></output></b></p>
+   <p>Source from observer 2 in Window: <b><output id="OSCPWSource"></output></b></p>
+   <br>
+   <p><b> ------ Dedicated Worker -------------------------------------------------------------------------- </b></p>
+   <p>State from observer in dedicated worker: <b><output id="CPDWState"></output></b></p>
+   <p>Source from observer in dedicated worker: <b><output id="CPDWSource"></output></b></p>
+   <p>Timestamp from observer in dedicated worker: <b><output id="CPDWTimestamp"></output></b></p>
+   <br>
+   <p><b> ------ Shared Worker ----------------------------------------------------------------------------- </b></p>
+   <p>State from observer in shared worker: <b><output id="CPSWState"></output></b></p>
+   <p>Source from observer in shared worker: <b><output id="CPSWSource"></output></b></p>
+   <p>Timestamp from observer in shared worker: <b><output id="CPSWTimestamp"></output></b></p>
 
   <!--
   // https://github.com/mdn/simple-shared-worker
@@ -35,8 +46,9 @@
 </html>
 
 <script>
-  document.body.style.backgroundColor= "LightCoral";
-  let isCoral = 1;
+/*
+  document.body.style.backgroundColor= "DarkSeaGreen";
+  let isCoral = 0;
   function changeBkColor()
   {
     if (isCoral) {
@@ -47,22 +59,53 @@
     isCoral = 1;
     }
   }
+*/
+
+  const error_msg = "ERROR";
 
   function pressureCallbackX(update) {
+    console.log("cpuState X = " + update[0].source);
     console.log("cpuState X = " + update[0].state);
     console.log("timestamp = " + update[0].time);
-   document.getElementById("CPWState").textContent = update[0].state;
+    if (update[0].source == "cpu") {
+      document.getElementById("CPWState").textContent = update[0].state;
+      document.getElementById("CPWSource").textContent = update[0].source;
+    } else if (update[0].source == "cpu-same-origin") {
+      document.getElementById("OSCPWState").textContent = update[0].state;
+      document.getElementById("OSCPWSource").textContent = update[0].source;
+    } else {
+      document.getElementById("CPWState").textContent = error_msg;
+      document.getElementById("CPWSource").textContent = error_msg;
+      document.getElementById("OSCPWState").textContent = error_msg;
+      document.getElementById("OSCPWSource").textContent = error_msg;
+    }
+
   };
 
-  observerX = new PressureObserver(pressureCallbackX, {sampleRate : 0.5});
+  // Window "cpu" observer.
+  observer_x = new PressureObserver(pressureCallbackX);
 
-  function startCP() {
-    observerX.observe("cpu");
+  function start_cp() {
+    observer_x.observe("cpu");
   }
 
-  function stopCP() {
-    observerX.unobserve("cpu");
+  function stop_cp() {
+    observer_x.unobserve("cpu");
     document.getElementById("CPWState").textContent = "";
+    document.getElementById("CPWSource").textContent = "";
+  }
+
+  // Window "cpu-same-origin" observer.
+  observer_so_x = new PressureObserver(pressureCallbackX);
+
+  function start_so_cp() {
+    observer_so_x.observe("cpu-same-origin");
+  }
+
+  function stop_so_cp() {
+    observer_so_x.unobserve("cpu-same-origin");
+    document.getElementById("CPWState").textContent = "";
+    document.getElementById("CPWSource").textContent = "";
   }
 
   const myDedicatedWorker = new Worker('d_worker.js');

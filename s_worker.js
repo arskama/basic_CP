@@ -5,7 +5,7 @@ onconnect = function(e) {
 
   port.start(); // Open the port connection to enable two-way communication
 
-  let observerWorker = new PressureObserver(pressureCallbackWkr, {sampleRate : 0.5});
+  let observerWorker = new PressureObserver(pressureCallbackWkr);
   console.log ("observer is " + typeof observerWorker)
 
   port.onmessage = function(e) {
